@@ -45,7 +45,7 @@ public class WeixinPayConfig implements Serializable {
 	
 	private int bDel;
 	
-	private int lCompanyCode;
+	private long lCompanyCode;
 	
 	private String sAdCode;
 	
@@ -155,14 +155,6 @@ public class WeixinPayConfig implements Serializable {
 		this.bDel = bDel;
 	}
 
-	public int getlCompanyCode() {
-		return lCompanyCode;
-	}
-
-	public void setlCompanyCode(int lCompanyCode) {
-		this.lCompanyCode = lCompanyCode;
-	}
-
 	public String getsAdCode() {
 		return sAdCode;
 	}
@@ -177,6 +169,14 @@ public class WeixinPayConfig implements Serializable {
 
 	public void setlMinute(float lMinute) {
 		this.lMinute = lMinute;
+	}
+
+	public long getlCompanyCode() {
+		return lCompanyCode;
+	}
+
+	public void setlCompanyCode(long lCompanyCode) {
+		this.lCompanyCode = lCompanyCode;
 	}
 	
 	

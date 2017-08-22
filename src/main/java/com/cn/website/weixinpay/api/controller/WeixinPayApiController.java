@@ -20,6 +20,7 @@ import com.cn.website.weixinpay.service.WeixinPayService;
 import com.cn.website.weixinpay.util.WXPayUtil;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.models.HttpMethod;
 
 
 @RestController
@@ -40,49 +41,45 @@ public class WeixinPayApiController {
 	        }
 	}
 	
-	@RequestMapping(value = "SavePayMent")
+	
+	@RequestMapping(value = "SavePayMent", method = RequestMethod.POST)
 	@ApiOperation(value = "回调信息", httpMethod = "POST", notes = "回调信息",tags="腾讯微信支付")
 	public String SavePayMent(String sCompanyID, String sAdCode,HttpServletRequest request, HttpServletResponse response) throws Exception{
+		//修改request 编码方式
+	    request.setCharacterEncoding("UTF-8");  
 		
 		long lCompanyID = 100;
         
 		sAdCode = "01";
-        
+        //获取微信端配置信息
         WeixinPayConfig config = weixinPayServiceImpl.getWeixinCfg(lCompanyID, sAdCode);
+        //通知是否接收成功信息 返回微信服务端
+        Map<String,String> notifyData = WXPayUtil.getMapFromRequest(request);
+        //如果是失败信息 则直接返回
+        if("FAIL".equals(notifyData.get("return_code"))){
+        	return WXPayUtil.mapToXml(notifyData);
+        }
+        PayWeixinLog log = new PayWeixinLog();
+        
+        /**
+         * 记录日志信息
+         */
+        log.setLogmsg(WXPayUtil.mapToXml(notifyData));
+        long id = weixinPayServiceImpl.saveNotify(log);
         
         
-		
-//		
-//		Map<String,String> notifyData = new HashMap<String,String>();
+        
+        return WXPayUtil.mapToXml(notifyData);
+        
+        
+  //     WXPayUtil.xmlToMap(rsn);
+  //      return 
+//		  Map<String,String> notifyData = new HashMap<String,String>();
 //        notifyData.put("return_msg", "公司未查询到相关失败");
-//		notifyData.put("return_code", "FAIL");
-//		PayWeixinLog log = new PayWeixinLog();
-//		String result = "";//返回给微信的处理结果  
-//        String inputLine="";  
-//        String notityXml = "";  
-//        request.setCharacterEncoding("UTF-8");  
-//        response.setCharacterEncoding("UTF-8");  
-//        response.setContentType("text/html;charset=UTF-8");  
-//        response.setHeader("Access-Control-Allow-Origin", "*");  
+//		  notifyData.put("return_code", "FAIL");
+//		  PayWeixinLog log = new PayWeixinLog();
 //        
-//       
-//        
-//        
-//      //微信给返回的东西  
-//        try {  
-//            while ((inputLine = request.getReader().readLine()) != null) {  
-//                notityXml += inputLine;  
-//            }  
-//            request.getReader().close();  
-//        } catch (Exception e) {  
-//            e.printStackTrace();  
-//            notifyData.put("return_msg", "xml获取失败");
-//            notifyData.put("return_code", "FAIL");
-//        }  
-//        if (StringUtils.isEmpty(notityXml)) {  
-//        	notifyData.put("return_msg", "xml为空");
-//            notifyData.put("return_code", "FAIL");
-//        }  
+
 //        
 //        notifyData.put("return_msg", "xml为空");
 //        notifyData.put("return_code", "");
@@ -103,7 +100,6 @@ public class WeixinPayApiController {
 //    
 //		  map.put("", value)
 //        System.out.println(rsn);
-        return "";
 	}
 	
 	@RequestMapping(value = "ResultNotifyPage",method = RequestMethod.POST)
